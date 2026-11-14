@@ -19,4 +19,4 @@ Preserve identifiers when you revise wording and the obligation stays the same. 
 
 Call `validate_srs` before `create_srs_pull_request`. If validation fails, or a gap line is still `blocking | unresolved`, fix the document or ask another question. Do not open the pull request.
 
-The pull request cites `tor.baseline.mergeCommit` and `tor.baseline.sha256`. It must not change `docs/tor.md` and it must not commit `docs/_analysis.md`. Refuse the pull request when the TOR is not approved or the hash does not match.
+The pull request cites `tor.baseline.mergeCommit` and `tor.baseline.sha256`. It must not change `docs/tor.md` and it must not commit `docs/_analysis.md`. Refuse the pull request when the TOR is not approved, the TOR hash does not match, the project plan is not approved, the plan hash is paused, or `srs.status` is `needs-review`.

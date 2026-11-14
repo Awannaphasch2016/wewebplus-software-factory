@@ -1,7 +1,8 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 import { slackUserIdFromAuth } from "../../../../lib/authz.mjs";
-import { loadApprovedTor } from "../../../../lib/project-files.mjs";
+import { loadApprovedPlan, loadApprovedTor } from "../../../../lib/project-files.mjs";
+import { assessPhase3Gate } from "../../../../lib/srs-validate.mjs";
 import { specificationConfig } from "../../../../generated/config.js";
 import { githubClientFromContext } from "../lib/github-token.js";
 
@@ -26,6 +27,19 @@ export default defineTool({
         projectId,
         reason: loaded.reason,
       };
+    }
+    const plan = await loadApprovedPlan(client, {
+      projectId,
+      userId: slackUserIdFromAuth(ctx.session.auth.current),
+      allowedUserIds: specificationConfig.allowedUserIds,
+    });
+    const phase = assessPhase3Gate({
+      project: loaded.project,
+      torText: loaded.documentText ?? "",
+      planPaused: plan.paused === true,
+    });
+    if (!phase.ok) {
+      return { denied: false, fetch: false, stop: true, projectId, reason: phase.reason };
     }
     const sandbox = await ctx.getSandbox();
     for (const [path, content] of Object.entries(loaded.files ?? {})) {
