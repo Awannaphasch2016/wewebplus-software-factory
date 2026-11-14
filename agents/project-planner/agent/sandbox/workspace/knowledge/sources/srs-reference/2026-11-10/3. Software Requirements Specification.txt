@@ -1,0 +1,177 @@
+AI Harness / Software Factory — Requirements
+Specification
+โครงการ: AI Harness Architecture (สาธิตผ่าน Quant Software Factory)
+ผู้จัดทำ: Anak Wannaphaschaiyong
+เวอร์ชันโครงสร้าง: v0.3 | สถานะ: ฉบับสำหรับตรวจทาน
+มาตรฐานอ้างอิง: ISO/IEC/IEEE 29148:2018 (ปรับใช้แบบย่อ ไม่ใช่การรับรองความสอดคล้องทั้งหมด)
+
+
+สารบัญ
+       1. Introduction
+       2. Scope
+       3. Functional Requirements
+       4. Nonfunctional Requirements
+       5. Acceptance Criteria
+       6. Constraints and References
+
+
+1. Introduction
+เอกสารนี้อธิบายข้อกำหนดของ AI harness — สถาปัตยกรรมที่เชื่อม context หรือข้อมูลประกอบการทำงานระหว่างระบบ
+อย่างควบคุม — และ Software Factory ซึ่งเป็นการนำสถาปัตยกรรมนี้ไปใช้สร้างซอฟต์แวร์จากข้อกำหนด
+
+
+2. Scope
+คำศัพท์หลัก
+
+   คำศัพท์                                  ความหมาย
+
+   AI harness                               โครงสร้างร่วมของพื้นที่ทำงาน การเชื่อมต่อ สิทธิ์ และขั้นตอนทำงานของ AI
+
+   Workspace / repository                   พื้นที่เก็บโค้ด ข้อกำหนด และประวัติการเปลี่ยนแปลง
+
+   Connector / app                          ตัวเชื่อมระบบภายนอก โดยใช้ least-privilege permissions หรือสิทธิ์เท่าที่จำเป็น
+
+   Agent / workflow                         AI ที่รับมอบหมายงาน / ลำดับขั้นตอนการทำงาน
+
+   I/O contract /                           ข้อตกลงข้อมูลเข้าและผลลัพธ์ / เกณฑ์ยอมรับที่ตรวจสอบได้
+   acceptance criteria
+
+   Draft PR / human                         ข้อเสนอรวมโค้ดที่ยังเป็นฉบับร่าง / การตรวจทานโดยมนุษย์
+   review
+
+   CI / sandbox                             การตรวจโค้ดและทดสอบอัตโนมัติ / สภาพแวดล้อมแยกสำหรับรันโค้ด
+
+   eve-foreman                              ชื่อ Software Factory bot ที่เป็นตัวแทน harness และสื่อสารผ่าน GitHub Issue comments; หลัก
+                                            ฐานรอบนี้แสดงชื่อบัญชี eve-forman[bot]
+
+
+
+
+Software Requirements Specification · v0.3 · Review                                                                                  1/5
+   คำศัพท์                                  ความหมาย
+
+   Demonstrated /                           สาธิตแล้ว / ข้อกำหนดหรือทิศทางที่ยังไม่ใช่ผลสำเร็จในรอบนี้
+   Intended
+
+
+ในขอบเขตที่สาธิต (Demonstrated)
+       Harness ที่เชื่อม GitHub ซึ่งเป็น workspace กับ Eve/Foreman บน Vercel ผ่าน GitHub App ที่ใช้ least-privilege
+       permissions
+       Factory contract: ข้อมูลเข้าคือ Issue และ acceptance criteria; agents พัฒนาและตรวจสอบ; ผลลัพธ์คือ draft PR
+       การตรวจรูปแบบโค้ดและชนิดข้อมูล รวมถึงทดสอบอัตโนมัติผ่าน GitHub Actions
+       สัญญาผลลัพธ์สิ้นสุดที่ draft PR สำหรับ human review (merge/deploy อยู่นอกขอบเขต Factory โดยออกแบบ)
+
+สมมติฐาน
+       Repository เป้าหมายเข้าถึงได้โดย GitHub App eve-forman โดยใช้ least-privilege permissions
+       Factory ทำงานบน Vercel โดยใช้ Eve/Foreman เป็นระบบประสานงาน agents
+       Issue มีข้อกำหนดและ acceptance criteria ที่ตรวจสอบได้
+
+
+
+
+Software Requirements Specification · v0.3 · Review                                                                   2/5
+Use case — ใครทำอะไร
+มนุษย์เตรียม Issue และเรียก Factory; Factory รับผิดชอบการพัฒนา ตรวจสอบ และจัดการ draft PR ส่วนการตัดสินใจรวมโค้ดเป็น
+ของมนุษย์
+
+
+
+
+ Software Requirements Specification · v0.3 · Review                                                              3/5
+3. Functional Requirements
+ระดับ Harness (สถาปัตยกรรม)
+
+   ID                  ข้อกำหนด
+
+   HR-01               ต้องมี workspace สำหรับโค้ด ข้อกำหนด และ version control
+
+   HR-02               การเข้าถึงระบบภายนอกต้องผ่าน connector/app ที่ใช้ least-privilege permissions
+
+   HR-03               ต้องรองรับการตั้งค่า agent workflow (agent เดี่ยวหรือหลายตัว)
+
+   HR-04               ต้องนิยามสัญญา input/output ของแต่ละ capability ได้
+
+   HR-05               ต้องแยกปรับการรันงาน การตรวจสอบผล และต้นทุนได้
+
+
+ระดับ Software Factory (instance)
+
+   ID             ข้อกำหนด
+
+   FR-01          รับคำขอจาก GitHub Issue พร้อม acceptance criteria
+
+   FR-02          ให้ bot ตัวแทน harness รายงานขั้นตอนผ่าน Issue comments: จัดประเภท → วางแผน → พัฒนา → ตรวจทาน
+
+   FR-03          ให้ Software Factory bot สร้าง branch, commit และเปิดหรือจัดการ draft PR
+
+   FR-04          ส่งมอบโค้ด ทดสอบ และเอกสารตามเกณฑ์ใน Issue
+
+   FR-05          มี independent review หรือการตรวจทานอิสระก่อนเปิด PR
+
+   FR-06          สัญญาผลลัพธ์สิ้นสุดที่ draft PR — ไม่รวม merge/deploy (โดยออกแบบ)
+
+   FR-07          เก็บกวาดหรือปิดบริการที่มีค่าใช้จ่ายทั้งหมดเมื่อ Software Factory ทำงานเสร็จ
+
+
+FR-07 เป็นข้อกำหนดเมื่อจบงาน ไม่ใช่ผลที่สาธิตแล้ว: รอบอ้างอิงยังปล่อย sandbox จนหมดเวลา ดูข้อจำกัดและต้นทุนใน
+เอกสารออกแบบ
+
+
+4. Nonfunctional Requirements
+
+   ID                 ข้อกำหนด
+
+   NFR-01             แพ็กเกจผลลัพธ์ต้องไม่พึ่งพา library ภายนอกขณะรัน เมื่อ Issue กำหนดให้ใช้เฉพาะ standard library
+
+   NFR-02             CI ผ่านตามชุดสภาพแวดล้อมทดสอบที่กำหนด
+
+   NFR-03             ตรวจสอบย้อนกลับได้ด้วย GitHub links
+
+   NFR-04             ต้นทุนต่อรอบวัดได้และใช้เป็นจุดอ้างอิง
+
+
+
+
+Software Requirements Specification · v0.3 · Review                                                                    4/5
+5. Acceptance Criteria
+
+   ID                         เกณฑ์ระดับระบบ
+
+   AC-01                      มี Issue เป็น input และ draft PR เป็น output ที่เชื่อมกัน
+
+   AC-02                      มีประวัติขั้นตอน Factory บน Issue
+
+   AC-03                      CI ของ PR ผ่าน
+
+   AC-04                      การตรวจทานอิสระไม่เหลือประเด็นที่ขัดขวางการส่งงาน
+
+   AC-05                      Output เป็น draft PR สำหรับ human review
+
+   AC-06                      มีตัวเลขต้นทุนอ้างอิงของรอบที่สำเร็จ
+
+
+การผ่าน AC หมายถึงได้ draft PR ที่พร้อมตรวจทานและผ่าน CI — การ merge/deploy เป็นการตัดสินใจของมนุษย์นอก
+ขอบเขต Factory ส่วน multi-agent ระดับองค์กรเป็นทิศทางการศึกษา
+
+
+6. Constraints and References
+ข้อจำกัด: พึ่งพา GitHub + Vercel + Eve/Foreman; ทดลองภายใต้งบและสิทธิ์ที่มี; ไม่เคลมความสอดคล้องเต็มรูปแบบกับ
+ISO 29148
+
+   รายการ                        ลิงก์
+
+   Repository                    https://github.com/Awannaphasch2016/quant-software-factory
+
+   Issue #1                      https://github.com/Awannaphasch2016/quant-software-factory/issues/1
+
+   PR #2                         https://github.com/Awannaphasch2016/quant-software-factory/pull/2
+
+   CI                            https://github.com/Awannaphasch2016/quant-software-factory/actions/runs/42272227033
+
+   เอกสารออกแบบ                  Read "4. Design Prototype.pdf"
+
+
+
+
+Software Requirements Specification · v0.3 · Review                                                                    5/5
+

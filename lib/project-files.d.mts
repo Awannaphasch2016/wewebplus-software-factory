@@ -53,6 +53,17 @@ export function loadApprovedDocument(
   },
 ): Promise<ProjectLoad>;
 
+export function loadApprovedPlan(
+  client: GithubClient,
+  input: {
+    projectId: string;
+    userId: string | null;
+    allowedUserIds: readonly string[];
+    headRef?: string;
+    ref?: string;
+  },
+): Promise<ProjectLoad & { paused?: boolean }>;
+
 export function loadApprovedTor(
   client: GithubClient,
   input: {

@@ -1,0 +1,10 @@
+{
+  "originalFilename": "3. Software Requirements Specification.pdf",
+  "originalSha256": "f2bf7987098dc74ebf765e6c5838ea63d117e8a17e558a6a2daa97a8d22a5105",
+  "extractionTool": "pdftotext",
+  "extractionToolVersion": "24.02.0 (Poppler)",
+  "extractionFlags": "-layout",
+  "extractedAt": "2026-11-10",
+  "extractedAtTimezone": "Asia/Bangkok",
+  "notes": "Text only; the PDF binary is not stored in the repository. PDF sha256 matches the planning-session value. The extractor in this environment is Poppler 24.02.0; the planning session recorded Poppler 25.03.0."
+}

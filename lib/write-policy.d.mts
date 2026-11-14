@@ -9,6 +9,7 @@ export function assessWrite(
     allowSrc?: boolean;
     branch?: string;
     torGrant?: { agent: string; projectId: string; branchPrefix: string };
+    planGrant?: { agent: string; projectId: string; branchPrefix: string };
   },
 ):
   | { allowed: true; relative: string }

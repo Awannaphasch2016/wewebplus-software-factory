@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "precedence": {
+    "model": [
+      "frozen-project-tor",
+      "approved-project-decisions",
+      "approved-reusable-guidelines",
+      "model-suggestions"
+    ],
+    "notes": "Numeric source priority applies only among reusable guideline sources. It never outranks a frozen project TOR or an approved project decision. Equal reusable-source priorities are reported, not merged."
+  },
+  "sources": [
+    {
+      "id": "tor-reference",
+      "title": "Reference TOR structure (extracted text)",
+      "origin": "Owner-supplied PDF 1. TOR.pdf, extracted text only",
+      "capturedAt": "2026-11-09T20:16:14.852Z",
+      "snapshotPath": "knowledge/sources/tor-reference/2026-11-10/1. TOR.txt",
+      "priority": 100,
+      "status": "approved",
+      "usage": "tor-structure"
+    },
+    {
+      "id": "srs-reference",
+      "title": "Reference SRS structure (extracted text)",
+      "origin": "Owner-supplied PDF 3. Software Requirements Specification.pdf, extracted text only",
+      "capturedAt": "2026-11-09T20:16:14.852Z",
+      "snapshotPath": "knowledge/sources/srs-reference/2026-11-10/3. Software Requirements Specification.txt",
+      "priority": 100,
+      "status": "approved",
+      "usage": "srs-structure"
+    },
+    {
+      "id": "project-plan-template",
+      "title": "Project Plan template, section 3",
+      "origin": "Owner document approved by Anak on 13 Nov 2026. Notion page Project Plan Template.",
+      "capturedAt": "2026-11-13T01:00:00.000Z",
+      "snapshotPath": "knowledge/sources/project-plan-template/2026-11-13/project-plan-template.md",
+      "priority": 100,
+      "status": "approved",
+      "usage": "plan-structure"
+    }
+  ]
+}

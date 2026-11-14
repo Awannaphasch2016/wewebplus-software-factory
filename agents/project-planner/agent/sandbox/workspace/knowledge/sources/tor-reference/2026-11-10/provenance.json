@@ -1,0 +1,10 @@
+{
+  "originalFilename": "1. TOR.pdf",
+  "originalSha256": "456998f0cf45c88b8cc772ba9b03b7bb22c33a80be15c7ba5a820e50ac42e4af",
+  "extractionTool": "pdftotext",
+  "extractionToolVersion": "24.02.0 (Poppler)",
+  "extractionFlags": "-layout",
+  "extractedAt": "2026-11-10",
+  "extractedAtTimezone": "Asia/Bangkok",
+  "notes": "Text only; the PDF binary is not stored in the repository. PDF sha256 matches the planning-session value. The extractor in this environment is Poppler 24.02.0; the planning session recorded Poppler 25.03.0."
+}
