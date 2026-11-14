@@ -7,7 +7,7 @@ import {
   githubRepoFromEnv,
 } from "../../../../lib/github.mjs";
 import { parseSimpleYaml } from "../../../../lib/project-yaml.mjs";
-import { assessSrsGate, validateSrs } from "../../../../lib/srs-validate.mjs";
+import { assessPhase3Gate, sha256, validateSrs } from "../../../../lib/srs-validate.mjs";
 import { githubClientFromContext } from "../lib/github-token.js";
 
 async function readOptional(
@@ -38,9 +38,13 @@ export default defineTool({
     const project = parseSimpleYaml(projectYaml);
     const torPath = `${root}/${project.tor?.path ?? "docs/tor.md"}`;
     const torText = await sandbox.readTextFile({ path: torPath });
-    const baseline = assessSrsGate({ project, torText: torText ?? "" });
+    const planPath = `${root}/${project.projectPlan?.path ?? "docs/project-plan.md"}`;
+    const planText = await readOptional(sandbox, planPath);
+    const planSha = project.projectPlan?.baseline?.sha256;
+    const planPaused = typeof planSha === "string" && planSha.length > 0 && sha256(planText) !== planSha;
+    const baseline = assessPhase3Gate({ project, torText: torText ?? "", planPaused });
     if (!baseline.ok || !baseline.sha256) {
-      throw new Error(`SRS is blocked until the approved TOR hash matches: ${baseline.reason ?? "tor-not-approved"}`);
+      throw new Error(`SRS is blocked until the approved project plan and TOR hash match: ${baseline.reason ?? "projectPlan-not-approved"}`);
     }
     const srs = await readOptional(sandbox, `${root}/docs/srs.md`);
     const elicitationLog = await readOptional(sandbox, `${root}/docs/elicitation-log.md`);
