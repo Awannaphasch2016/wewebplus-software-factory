@@ -139,6 +139,109 @@ test("approve records the human commits and merges the pinned head once", async 
   assert.equal(harness.state.merges.length, 1);
 });
 
+test("Gate 1 reject without a reason is refused", async () => {
+  const harness = openHarness();
+  const waiting = await handleGateClick(click(harness, { action: "reject" }));
+  assert.equal(waiting.status, "needs-reason");
+  assert.equal(harness.state.closes.length, 0);
+  const comments = harness.state.comments[12] ?? [];
+  assert.equal(comments.some((comment) => comment.body.includes("factory-decision")), false);
+});
+
+test("Gate 1 request revision without a reason is refused", async () => {
+  const harness = openHarness();
+  const waiting = await handleGateClick(click(harness, { action: "revise" }));
+  assert.equal(waiting.status, "needs-reason");
+  assert.equal(harness.state.closes.length, 0);
+  assert.equal(harness.state.merges.length, 0);
+});
+
+test("whitespace-only reason is refused", async () => {
+  const harness = openHarness();
+  const refused = await handleGateClick(click(harness, { action: "reject", reason: " \n\t " }));
+  assert.equal(refused.status, "refused");
+  assert.equal(harness.state.closes.length, 0);
+  const posts = [];
+  const waiting = await handleGateClick(click(harness, { action: "revise", post: (payload) => posts.push(payload) }));
+  const blank = await handleReasonReply(reply(harness, posts[0].text, "   "));
+  assert.equal(blank.status, "needs-reason");
+  assert.equal(harness.state.comments[12].some((comment) => comment.body.includes("factory-decision")), false);
+});
+
+test("Gate 1 reject with a reason records it on the decision", async () => {
+  const harness = openHarness();
+  const done = await handleGateClick(click(harness, { action: "reject", reason: "Scope is still draft." }));
+  assert.equal(done.status, "rejected");
+  assert.equal(done.decision.reason, "Scope is still draft.");
+  assert.deepEqual(harness.state.closes, [12]);
+});
+
+test("Gate 1 request revision with a reason records it on the decision", async () => {
+  const harness = openHarness();
+  const done = await handleGateClick(click(harness, { action: "revise", reason: "Add the missing acceptance row." }));
+  assert.equal(done.status, "revise");
+  assert.equal(done.decision.reason, "Add the missing acceptance row.");
+  assert.equal(harness.state.closes.length, 0);
+  assert.equal(harness.state.merges.length, 0);
+});
+
+test("approve still completes without a reason", async () => {
+  const harness = openHarness();
+  const done = await handleGateClick(click(harness, { reason: undefined }));
+  assert.equal(done.status, "approved");
+  assert.equal(done.decision.reason, null);
+  assert.equal(harness.state.merges.length, 1);
+});
+
+test("setup-stage reject also requires a reason", async () => {
+  const harness = openHarness();
+  const waiting = await handleGateClick(click(harness, { action: "reject", stage: "setup" }));
+  assert.equal(waiting.status, "needs-reason");
+  assert.equal(harness.state.closes.length, 0);
+  const done = await handleGateClick(click(harness, { action: "reject", stage: "setup", reason: "Wrong customer." }));
+  assert.equal(done.status, "rejected");
+  assert.equal(done.decision.stage, "setup");
+  assert.equal(done.decision.reason, "Wrong customer.");
+});
+
+test("a reason modal opens before any decision, and a failed modal falls back to the thread", async () => {
+  const harness = openHarness();
+  let opened = null;
+  const modal = await handleGateClick(click(harness, {
+    action: "reject",
+    openReasonModal: async (view) => {
+      opened = view;
+    },
+  }));
+  assert.equal(modal.status, "refused");
+  assert.equal(modal.capture, "modal");
+  assert.equal(opened.callback_id, "factory-gate-reason");
+  assert.equal(harness.state.closes.length, 0);
+  assert.equal(harness.state.comments[12], undefined);
+  const posts = [];
+  const fallback = await handleGateClick(click(harness, {
+    action: "reject",
+    post: (payload) => posts.push(payload),
+    openReasonModal: async () => {
+      throw new Error("views.open failed");
+    },
+  }));
+  assert.equal(fallback.status, "needs-reason");
+  assert.match(posts[0].text, /Reply in this thread/);
+});
+
+test("the in-card reason field records the same decision", async () => {
+  const harness = openHarness();
+  const button = { projectId: "demo", stage: "tor", pr: 12, headSha: HEAD, action: "reject", repo: "o/r" };
+  const done = await handleGateClick({
+    ...click(harness, { action: "reject" }),
+    value: "Scope is still draft.",
+    blockId: JSON.stringify(button),
+  });
+  assert.equal(done.status, "rejected");
+  assert.equal(done.decision.reason, "Scope is still draft.");
+});
+
 test("reject and revise require a reason, and the next allowlisted reply completes the decision", async () => {
   const harness = openHarness();
   const posts = [];
@@ -233,7 +336,8 @@ function openHarness({ headSha = HEAD } = {}) {
 function click(harness, overrides = {}) {
   const now = Date.parse("2026-11-14T08:00:00.000Z");
   const action = overrides.action ?? "approve";
-  const value = JSON.stringify({ projectId: "demo", stage: "tor", pr: 12, headSha: HEAD, action, repo: "o/r" });
+  const stage = overrides.stage ?? "tor";
+  const value = JSON.stringify({ projectId: "demo", stage, pr: 12, headSha: HEAD, action, repo: "o/r" });
   const timestamp = String(Math.floor(now / 1000));
   return {
     actionId: overrides.actionId ?? `gate:${action}`,
@@ -252,6 +356,9 @@ function click(harness, overrides = {}) {
     allowedChannelIds: [CHANNEL],
     loadProjectUsers: async () => [ANAK],
     post: overrides.post,
+    reason: overrides.reason,
+    openReasonModal: overrides.openReasonModal,
+    reasonCapture: overrides.reasonCapture,
   };
 }
 

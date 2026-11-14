@@ -1,6 +1,8 @@
 import type { SlackInboundMessageContext, SlackInteractionAction, SlackInteractionContext, SlackMessage } from "eve/channels/slack";
 import type { GithubClient } from "./github.mjs";
-import { actorFromUsersInfo, handleGateClick, handleReasonReply } from "./slack-gate.mjs";
+import { actionNeedsReason } from "./gate-actions.mjs";
+import { renderGateReasonModal } from "./gate-reason.mjs";
+import { actorFromUsersInfo, handleGateClick, handleReasonReply, parseGateButtonValue } from "./slack-gate.mjs";
 
 export type SlackGateOptions = {
   agent: string;
@@ -36,6 +38,22 @@ export function createSlackGate(options: SlackGateOptions) {
   return {
     async onInteraction(action: SlackInteractionAction, ctx: SlackInteractionContext) {
       if (!action.actionId.startsWith("gate:")) return;
+      let reasonCapture: "modal" | undefined;
+      const early = parseGateButtonValue(action.value ?? "");
+      if (early.ok && actionNeedsReason(early.button.action) && action.triggerId) {
+        try {
+          await ctx.slack.request("views.open", {
+            trigger_id: action.triggerId,
+            view: renderGateReasonModal({
+              title: early.button.action === "revise" ? "Request revision" : "Reject",
+              button: early.button,
+            }),
+          });
+          reasonCapture = "modal";
+        } catch {
+          reasonCapture = undefined;
+        }
+      }
       try {
         const info = await ctx.slack.request("users.info", { user: action.user.id });
         const actorResult = actorFromUsersInfo(action.user.id, info as { ok?: boolean; user?: { is_bot?: boolean; is_app_user?: boolean; bot_id?: string } });
@@ -47,6 +65,7 @@ export function createSlackGate(options: SlackGateOptions) {
         const result = await handleGateClick({
           actionId: action.actionId,
           value: action.value,
+          blockId: action.blockId,
           actor: { ...actorResult.actor, teamId: ctx.slack.teamId },
           channelId: ctx.slack.channelId,
           messageTs: action.messageTs,
@@ -56,6 +75,7 @@ export function createSlackGate(options: SlackGateOptions) {
           client,
           allowedUserIds: options.allowedUserIds,
           allowedChannelIds: options.allowedChannelIds,
+          reasonCapture,
           post: (payload: GatePost) => post(ctx, payload),
         });
         if (result.status === "approved" || result.status === "rejected" || result.status === "revise") {

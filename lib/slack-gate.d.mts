@@ -26,6 +26,9 @@ export function renderHashMismatchAlert(input: { projectId: string; reason?: str
   text: string;
   blocks: readonly Record<string, unknown>[];
 };
+export function resolveGateClick(input: { value?: string; blockId?: string; reason?: string }):
+  | { ok: true; button: { projectId: string; stage: string; pr: number; headSha: string; action: string; repo: string }; reason: string | undefined }
+  | { ok: false; reason: string };
 export function handleGateClick(input: Record<string, any>): Promise<Record<string, any>>;
 export function pendingFromThread(threadMessages: readonly { text?: string; isBot?: boolean }[]): Record<string, any> | null;
 export function handleReasonReply(input: Record<string, any>): Promise<Record<string, any>>;
