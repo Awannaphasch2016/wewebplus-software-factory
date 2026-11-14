@@ -22,6 +22,8 @@ for (const source of activeSources) {
 
 const agentRoots = [];
 for (const name of await readdir(resolve(repoRoot, "agents"))) {
+  // Phase 2 leaves the Stage 4 Planning Agent untouched, including its packaged knowledge.
+  if (name === "planning") continue;
   const marker = resolve(repoRoot, "agents", name, "agent/sandbox/sandbox.ts");
   try {
     if ((await stat(marker)).isFile()) {

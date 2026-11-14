@@ -107,7 +107,8 @@
               "srs-structure",
               "quality",
               "traceability",
-              "precedence"
+              "precedence",
+              "plan-structure"
             ]
           }
         }

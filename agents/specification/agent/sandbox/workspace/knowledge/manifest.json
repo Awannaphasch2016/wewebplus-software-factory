@@ -30,6 +30,16 @@
       "priority": 100,
       "status": "approved",
       "usage": "srs-structure"
+    },
+    {
+      "id": "project-plan-template",
+      "title": "Project Plan template, section 3",
+      "origin": "Owner document approved by Anak on 13 Nov 2026. Notion page Project Plan Template.",
+      "capturedAt": "2026-11-13T01:00:00.000Z",
+      "snapshotPath": "knowledge/sources/project-plan-template/2026-11-13/project-plan-template.md",
+      "priority": 100,
+      "status": "approved",
+      "usage": "plan-structure"
     }
   ]
 }
