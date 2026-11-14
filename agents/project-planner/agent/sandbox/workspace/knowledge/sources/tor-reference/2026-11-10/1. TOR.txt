@@ -1,0 +1,158 @@
+AI Harness / Software Factory — TOR
+โครงการ: AI Harness Architecture (สาธิตผ่าน Quant Software Factory)
+ผู้จัดทำ: Anak Wannaphaschaiyong
+
+
+สารบัญ
+      1. Document Information
+      2. Project Background and Objectives
+      3. Project Scope
+      4. Deliverables and Acceptance
+      5. Constraints and Commitments
+      References
+
+
+1. Document Information
+1.1 Document Identification
+เอกสาร TOR กำหนดเหตุผล วัตถุประสงค์ ขอบเขต และสิ่งส่งมอบที่ตั้งใจของโครงการ Software Factory เรียบเรียงย้อน
+หลังจากแหล่งข้อมูลที่มี โดยใช้มุมมองเมื่อเริ่มโครงการ ไม่ใช้ผลต้นแบบภายหลังเป็นหลักฐานว่าเคยตัดสินใจหรืออนุมัติไว้
+แล้ว
+
+1.2 References
+SRS และ Design Prototype เป็นเอกสารปลายทางที่ขยายข้อกำหนดและการออกแบบ [1][2] ไม่ได้หมายความว่าเอกสาร
+เหล่านั้นเสร็จแล้วเมื่อเริ่มโครงการ รายการอ้างอิงอยู่ท้ายเอกสาร
+
+
+2. Project Background and Objectives
+2.1 Project Background
+Context หรือข้อมูลประกอบงานแยกอยู่ในแต่ละแอป ต้องย้ายข้อมูลด้วยมือ และยังมีประสบการณ์ใช้ AI ทำงานจริงจำกัด
+จึงต้องการโครงสร้างร่วมที่เชื่อมข้อมูล สิทธิ์ และขั้นตอนทำงานอย่างควบคุม เพื่อนำกลับมาใช้ได้โดยไม่เริ่มเชื่อมระบบใหม่
+ทุกครั้ง
+
+2.2 Project Purpose
+พัฒนาแนวทาง AI harness โดยใช้ Software Factory เป็นกรณีศึกษา รับข้อกำหนดแล้วให้ AI สร้างโค้ดที่ตรวจสอบได้และ
+ส่งให้มนุษย์ตรวจทาน ไม่แทนการตัดสินใจของมนุษย์ในการ merge หรือ deploy[1]
+
+2.3 Project Objectives
+      มี specification และ design ที่ผ่านการตรวจสอบ มีหลักฐานเพียงพอสำหรับพิจารณา design freeze
+      มีโครงสร้าง workspace, connector, agent workflow และสัญญา input/output ที่เข้าใจและพัฒนาต่อได้ [1]
+      ตรวจสอบความเป็นไปได้ด้วยต้นแบบ ตั้งแต่ Issue ที่มีเกณฑ์ยอมรับจนถึง draft PR พร้อมหลักฐานการตรวจสอบ โดย
+      วัดต้นทุนของรอบตัวอย่างได้ [1]
+
+
+
+
+TOR                                                                                                                  1/4
+3. Project Scope
+3.1 In Scope
+          กำหนดและตรวจสอบข้อกำหนด สถาปัตยกรรม และการออกแบบของ harness และ Software Factory ผ่านวงรอบ
+          specification–research–prototype
+          เชื่อม GitHub เป็น workspace ผ่าน connector/app ที่ใช้ least-privilege permissions [1][4]
+          รับ Issue พร้อม acceptance criteria ให้ agents วางแผน พัฒนา ทดสอบ ตรวจทานอิสระ และจัดการ draft PR พร้อม
+          รายงานความคืบหน้า [1]
+          ใช้ sandbox เป็นสภาพแวดล้อมแยกสำหรับรันและทดสอบโค้ด ร่วมกับ CI และหลักฐานที่ตรวจสอบย้อนกลับได้ [1][2]
+          วัดต้นทุนอ้างอิงและจัดการบริการที่มีค่าใช้จ่ายเมื่อจบงาน [1]
+
+3.2 Out of Scope
+การตัดสินใจ merge/deploy ไม่อยู่ในสัญญาผลลัพธ์ของ Factory และเป็นหน้าที่ของมนุษย์ ส่วน enterprise agent
+teams, long-running และ coordinating agents เป็นทิศทางวิจัย ไม่ใช่ระบบที่โครงการนี้ต้องส่งมอบ [1][2]
+
+3.3 High-Level Requirements
+
+        กลุ่ม          ความคาดหวังระดับสูง
+
+        Harness        มีโครงสร้างร่วมที่เชื่อมข้อมูลและเครื่องมืออย่างควบคุม กำหนดสิทธิ์และขอบเขตงานชัดเจน และนำไปปรับใช้
+                       ซ้ำได้
+
+        Factory        เปลี่ยนข้อกำหนดเป็นผลงานซอฟต์แวร์สำหรับมนุษย์ตรวจทาน โดยมีการพัฒนา ตรวจสอบ และสื่อสารความคืบ
+                       หน้าที่ติดตามได้
+
+        Quality        ผลงานตรวจสอบได้ สอดคล้องกับข้อกำหนดและข้อจำกัด ใช้ทรัพยากรอย่างเหมาะสม และมีหลักฐานประกอบ
+                       การประเมินคุณภาพ
+
+
+ข้อกำหนดและเงื่อนไขโดยละเอียดจะขยายใน SRS ไม่กำหนดรายละเอียดซ้ำใน TOR [1]
+
+
+4. Deliverables and Acceptance
+4.1 Software Deliverables
+ต้นแบบ Software Factory ใช้ตรวจสอบความเป็นไปได้และอธิบายผลใน Design Prototype [2] โค้ด ผลทดสอบ และหลัก
+ฐานอ้างอิงอยู่ภายในขอบเขตเนื้อหาของเอกสารที่เกี่ยวข้อง ไม่กำหนดเป็นสิ่งส่งมอบเพิ่มเติมแยกจากเอกสารสี่รายการ
+
+4.2 Documentation Deliverables
+
+        เอกสาร                                              หน้าที่
+
+        TOR                                                 เหตุผล วัตถุประสงค์ ขอบเขต ข้อจำกัด และสิ่งส่งมอบ
+
+        Project Plan                                        วิธีดำเนินงาน ทรัพยากร และการติดตามความคืบหน้า
+
+        Software Requirements Specification                 ข้อกำหนดและเกณฑ์ยอมรับของระบบ [1]
+
+        Design Prototype                                    การออกแบบ ต้นแบบ และหลักฐานความเป็นไปได้ [2]
+
+
+
+  สิ่                           สี่       นี้                                                                   ทั้
+
+TOR                                                                                                                          2/4
+สิ่งส่งมอบมีเฉพาะเอกสารสี่รายการนี้ การอ้างอิง ISO เป็นแนวทางสนับสนุน ไม่ใช่การรับรองความสอดคล้องทั้งหมด [3]
+
+4.3 Acceptance Criteria
+คาดหวังให้ต้นแบบแสดงการเปลี่ยนข้อกำหนดเป็น draft PR สำหรับมนุษย์ตรวจทาน พร้อมหลักฐานขั้นตอน ผลการตรวจ
+สอบคุณภาพ การตรวจทานที่ไม่เหลือประเด็นขัดขวางการส่งงาน และต้นทุนอ้างอิง รายละเอียดเกณฑ์ยอมรับจะกำหนดใน
+SRS ภายหลัง [1] การผ่านเกณฑ์ต้นแบบไม่เท่ากับการอ้างว่า design freeze แล้ว
+
+
+5. Constraints and Commitments
+5.1 Technical and Organizational Constraints
+พิจารณาข้อกำหนดควบคู่กับทักษะ วิธีทำงาน สิทธิ์เข้าถึง การจัดซื้อ และวิธีชำระเงิน ไม่เลือกจากความสามารถเทคนิคอย่าง
+เดียว ใช้ Vercel เป็นแพลตฟอร์มหลักร่วมกับ GitHub และ Eve/Foreman โดยเป็น practical trade-off ระหว่างเวลา
+พัฒนา เครื่องมือที่เชื่อมกัน ความครบของ ecosystem และความคุ้นเคยที่ช่วยลดภาระการเรียนรู้และการประกอบบริการ
+หลายส่วน ไม่อ้างว่าเป็นแพลตฟอร์มที่ดีที่สุดทุกกรณี
+
+บริษัทไม่ได้จัดสรรค่าใช้จ่าย Vercel ให้โครงการ; Anak ชำระด้วยงบส่วนตัว ไม่กำหนดประมาณการงบใน TOR
+
+5.2 Timeline and Milestones
+
+  รายการ                   กรอบดำเนินงาน
+
+  เริ่มโครงการ             7 ต.ค. 2569
+
+  สิ้นสุดช่วงโครงการ       6 พ.ย. 2569
+
+  จังหวะดำเนินงาน          specification–research–prototype หนึ่งรอบต่อสัปดาห์
+
+  Design freeze            พิจารณาจากหลักฐานตามเงื่อนไขด้านล่าง ไม่กำหนดวันหรือจำนวนรอบตายตัว
+
+
+Design freeze เกิดเมื่อ specification สอดคล้องกับวัตถุประสงค์ ขอบเขต และข้อกำหนด TOR และ architecture/design
+ผ่านการตรวจสอบว่าสามารถทำ specification ให้เป็นจริงได้ ทำซ้ำจนช่องว่างสำคัญระหว่าง TOR, specification, design
+และ prototype ได้รับการแก้ไข ไม่เพิ่มขั้นตอน sign-off และไม่ถือว่าวันสิ้นสุดช่วงโครงการยืนยันว่า freeze สำเร็จ
+
+5.3 Responsibilities and Dependencies
+Anak Wannaphaschaiyong เป็นผู้รับผิดชอบโครงการเพียงคนเดียว ตั้งแต่ข้อกำหนด การศึกษา การพัฒนา/ตรวจสอบ
+ต้นแบบ เอกสาร และการติดตามผล Factory agents เป็นเครื่องมือ ไม่ใช่บุคลากรเพิ่มเติม
+
+การทำงานพึ่งพา GitHub repository และ App ที่มีสิทธิ์เท่าที่จำเป็น, Vercel runtime/services และ Issue ที่มีเกณฑ์
+ยอมรับชัดเจน มนุษย์ยังคงตรวจทานผลและตัดสินใจ merge/deploy นอกขอบเขต Factory [1][2]
+
+
+
+
+TOR                                                                                                               3/4
+References
+[1] Read "3. Software Requirements Specification.pdf"
+
+[2] Read "4. Design Prototype.pdf"
+
+[3] ISO/IEC 29110-5-1-2:2025 — ข้อมูลมาตรฐานจาก ISO: https://www.iso.org/standard/82669.html
+
+[4] Quant Software Factory GitHub repository — https://github.com/Awannaphasch2016/quant-software-
+factory
+
+
+
+
+TOR                                                                                                  4/4
+
