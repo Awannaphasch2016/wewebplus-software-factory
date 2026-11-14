@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +24,7 @@ const USAGES = new Set([
   "quality",
   "traceability",
   "precedence",
+  "plan-structure",
 ]);
 
 const EXPECTED_PDF_SHA256 = {
@@ -191,6 +193,19 @@ async function verifyProvenance(source) {
   if (!/^[a-f0-9]{64}$/.test(provenance.originalSha256)) {
     fail(`provenance for ${source.id} originalSha256 must be 64 lowercase hex characters.`);
   }
+  if (source.usage === "plan-structure") {
+    if (provenance.originalFilename !== "project-plan-template.md") {
+      fail(`provenance for ${source.id} must name project-plan-template.md.`);
+    }
+    const hash = createHash("sha256").update(await readFile(snapshot)).digest("hex");
+    if (provenance.originalSha256 !== hash) {
+      fail(`provenance for ${source.id} sha256 does not match the markdown snapshot.`);
+    }
+    if (!/text only/i.test(provenance.notes)) {
+      fail(`provenance for ${source.id} must state that only text is stored.`);
+    }
+    return provenancePath;
+  }
   if (provenance.originalFilename.toLowerCase().endsWith(".pdf") === false) {
     fail(`provenance for ${source.id} must name the original PDF.`);
   }
@@ -258,7 +273,11 @@ export async function verifyKnowledge() {
     if (!source.snapshotPath.startsWith(`knowledge/sources/${source.id}/`)) {
       fail(`source ${source.id} must point into knowledge/sources/${source.id}/.`);
     }
-    if (!source.snapshotPath.endsWith(".txt")) {
+    if (source.usage === "plan-structure") {
+      if (!source.snapshotPath.endsWith(".md")) {
+        fail(`source ${source.id} snapshot must be the markdown template.`);
+      }
+    } else if (!source.snapshotPath.endsWith(".txt")) {
       fail(`source ${source.id} snapshot must be extracted text (.txt), never a PDF.`);
     }
     await requireRegularFile(
